@@ -15,5 +15,5 @@ yamdb_final
 # Доступ к проекту
 Данный проект доступен по адрессу http://62.84.118.133:5000.
 
-# Бейдж о статусе работы в Workflow
+# Бейдж о статусе работы в Workflow.
 ![example workflow](https://github.com/oilman23/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
