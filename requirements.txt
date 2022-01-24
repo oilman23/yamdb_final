@@ -32,3 +32,4 @@ django-braces==1.14.0
 gunicorn==20.0.4
 psycopg2-binary==2.8.6
 PyJWT==2.1.0
+sentry-sdk==0.16.5

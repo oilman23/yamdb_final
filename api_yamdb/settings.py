@@ -1,4 +1,13 @@
 import os
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+# скопируйте dsn из вашего личного кабинета на Sentry:
+# Projects → <имя-проекта> → Client Keys
+sentry_sdk.init(
+    dsn="https://c059a63ebb48447986b33f9de712ef29@o1117109.ingest.sentry.io/6150983",
+    integrations=[DjangoIntegration()],
+)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
