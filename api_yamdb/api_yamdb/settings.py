@@ -1,22 +1,19 @@
 import os
+from datetime import timedelta
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-
-# скопируйте dsn из вашего личного кабинета на Sentry:
-# Projects → <имя-проекта> → Client Keys
-sentry_sdk.init(
-    dsn="https://c059a63ebb48447986b33f9de712ef29@o1117109.ingest.sentry.io/6150983",
-    integrations=[DjangoIntegration()],
-)
-
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
-
-DEBUG = True
+ADMIN_EMAIL = 'api_yamdb@example.com'
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['*']
+
+AUTH_USER_MODEL = 'reviews.User'
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -25,8 +22,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'djoser',
     'reviews',
-    'users',
+    'api',
     'django_filters',
 ]
 
@@ -61,16 +60,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 
+
+# Database
+
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', default="django.db.backends.postgresql"),
-        'NAME': os.getenv('DB_NAME', default="postgres"),
-        'USER': os.getenv('POSTGRES_USER', default="postgres"),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="postgres2305"),
-        'HOST': os.getenv('DB_HOST', default="db"),
-        'PORT': os.getenv('DB_PORT', default=5432)
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', default='postgres'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='db'),
+        'PORT': os.getenv('DB_PORT', default='5432'),
     }
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+# Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -87,7 +94,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
+
+# Internationalization
+
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -97,29 +107,34 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
 
-# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+# Static files (CSS, JavaScript, Images)
+
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-AUTH_USER_MODEL = 'users.User'
-
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
-    ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
-DOMAIN_EMAIL = 'awesome@awesome.com'
+APPEND_SLASH = False
+
+ROLE_USER = 'user'
+ROLE_MODERATOR = 'moderator'
+ROLE_ADMIN = 'admin'
